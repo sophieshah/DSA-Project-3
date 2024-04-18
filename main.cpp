@@ -6,9 +6,7 @@
 
 using namespace std;
 
-int main() {
-
-    map<int, vector<string>> m;
+void makeMap(map<int, vector<string>> &m){
 
     ifstream inFile;
     inFile.open("C:\\DSAProject3/movies.csv", ios::in);
@@ -85,12 +83,30 @@ int main() {
 
     map<int, vector<string>>::iterator it;
     for(it = m.begin(); it != m.end(); it++){
-        cout<<it->first<<" ";
+        //cout<<it->first<<" ";
         for(int i=0; i<it->second.size(); i++){
-            cout<<it->second[i]<<" ";
+            //cout<<it->second[i]<<" ";
         }
-        cout<<endl;
+        //cout<<endl;
     }
+}
+
+int main() {
+    map<int, vector<string>> m;
+
+    makeMap(m);
+
+    cout<<"Enter two desired genres: ";
+
+    string genre1, genre2;
+
+    cin >> genre1;
+    cin >> genre2;
+
+    cout<<endl;
+
+    cout<<genre1<<" "<<genre2<<endl;
+
 
     return 0;
 }
