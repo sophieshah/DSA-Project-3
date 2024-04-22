@@ -272,7 +272,7 @@ vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1){
     sort(ratingVector.begin(), ratingVector.end());
     for(int i = ratingVector.size() - 1; i > ratingVector.size() - 6; i--)
     {
-        cout << ratingVector[i].second << endl;
+        //cout << ratingVector[i].second << endl;
         topMovies.push_back(ratingVector[i].second);
     }
     return topMovies;
@@ -431,19 +431,26 @@ int main() {
 
 
     cin >> genre1;
-    cout<<endl;
+    cout<<endl<<endl<<endl;
     //cout<<genre1<<endl;
 
 
     findBestMovieUnordered(um, genre1);
     vector<string> bestUmMovies = findBestMovieUnordered(um, genre1);
-    cout<<"Your recommended movies are:"<<endl;
+    cout << "        Your top five recommended movies:\n" << endl;
+    cout << "Name(Year)          Rating            Duration" << endl;
+    cout << "-----------------------------------------------" << endl;
+    cout<<endl;
+
     for(int i=0; i<5; i++){
         auto it = um.find(bestUmMovies[i]);
         if(it != um.end()){
-            cout<<(*it)[1]<<endl;
+            cout << i+1 << ". " << (*it)[1]<<"("<<(*it)[3]<<")    Rating: " << (*it)[2] <<"    Duration: "<<(*it)[4]<< endl;
+            cout << "Description: " << (*it)[5]<< "\n";
+            cout<<endl;
         }
     }
+
 
    vector<string> bestMovieId = findBestMovieMap(m, genre1);
     cout << "        Your top five recommended movies:\n" << endl;
