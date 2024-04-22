@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <algorithm>
 
 using namespace std;
 
@@ -105,32 +106,19 @@ public:
     }
 };
 
-string findBestMovieMap(map<string,vector<string>> m, string genre1, string genre2){
-    bool g1 = false , g2 = false;
-    float highestRating = 0.0;
-    string bestMovieId;
-
-
+vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1){
+    vector<pair<float, string>> ratingVector;
+    vector<string> topMovies;
     map<string, vector<string>>::iterator it;
     for(it=m.begin(); it != m.end(); it++){
         try{
-            float rating = std::stof(it->second[1]);
+            // Saves rating
+            float rating = stof(it->second[1]);
+            // Iterates through genres of movie id
             for(int i=2; i<it->second.size(); i++){
                 //cout<<rating<<endl;
-                g1, g2 = false;
-
-
                 if(it->second[i]== genre1){
-                    g1 = true;
-                }
-                if(it->second[i] == genre2){
-                    g2 = true;
-                }
-
-
-                if(g1 && g2 && rating > highestRating){
-                    highestRating  = std::stof(it->second[1]);
-                    bestMovieId = it->first;
+                    ratingVector.emplace_back(rating, it->first);
                 }
             }
         }
@@ -138,118 +126,65 @@ string findBestMovieMap(map<string,vector<string>> m, string genre1, string genr
             cout<<"invalid stof "<<it->second[1]<<" "<<it->first<<endl;
             continue;
         }
-
-
-
-
     }
-    cout<<bestMovieId<<endl;
-    return bestMovieId;
+    sort(ratingVector.begin(), ratingVector.end());
+    for(int i = ratingVector.size() - 1; i > ratingVector.size() - 6; i--)
+    {
+        cout << ratingVector[i].second << endl;
+        topMovies.push_back(ratingVector[i].second);
+    }
+    return topMovies;
 }
-
-
 void makeMap(map<string, vector<string>> &m){
-
-
     ifstream inFile;
     inFile.open("C:\\DSAProject3/movies.csv", ios::in);
-
-
     if (!inFile.is_open()) {
         cout<<"unopened"<<endl;
     }
-
-
     string movieId;
     vector<string> movieElements;
     string line, name, rating;
-
-
     getline(inFile, line);
     istringstream s(line);
-
-
-
-
     getline(s, movieId, ',');
     getline(s, name, ',');
     getline(s, rating, ',');
-
-
     for(int i=0; i<10000; i++){
         movieElements.clear();
-
-
         getline(inFile, line);
         istringstream s(line);
-
-
-
-
         getline(s, movieId, ',');
         getline(s, name, ',');
         getline(s, rating, ',');
-
-
         //cout<<movieId<<" "<<name<<" "<<rating<<endl;
         //movieElements.push_back(movieId);
         movieElements.push_back(name);
         movieElements.push_back(rating);
-
-
         m.insert({movieId, movieElements});
     }
-
-
     inFile.close();
-
-
     inFile.open("C:\\DSAProject3/genres.csv", ios::in);
-
-
     if (!inFile.is_open()) {
         cout<<"unopened"<<endl;
     }
-
-
     string id, genre;
-
-
     getline(inFile, line);
     istringstream b(line);
-
-
     getline(b, id, ',');
     getline(b, genre, ',');
-
-
     for(int i=0; i<10000; i++){
         getline(inFile, line);
         istringstream b(line);
-
-
-
-
         getline(b, id, ',');
         getline(b, genre, ',');
-
-
         //cout<<id<<" "<<genre<<endl;
-
-
         auto it = m.find(id);
         if(it != m.end()){
             it->second.push_back(genre);
         }
-
-
         genre = "";
-
-
     }
     inFile.close();
-
-
 //    map<string, vector<string>>::iterator it;
 //    for(it = m.begin(); it != m.end(); it++){
 //        cout<<it->first<<" ";
@@ -259,16 +194,12 @@ void makeMap(map<string, vector<string>> &m){
 //        cout<<endl;
 //    }
 }
-
-
 int main() {
     map<string, vector<string>> m;
-
-
     makeMap(m);
-
     cout << " _______________________________________" << endl;
     cout << "|         Welcome to Show-Intel!        |" << endl;
+    cout << "|           You Tell, We Show           |" << endl;
     cout << "|---------------------------------------|" << endl;
     cout << "|      Action              Adventure    |" << endl;
     cout << "|      Animation           Comedy       |" << endl;
@@ -294,19 +225,16 @@ int main() {
 
 
     cout<<genre1<<endl;
+    
 
-
-
-
-    string bestMovieId = findBestMovieMap(m,genre1, genre1);
-    auto it = m.find(bestMovieId);
-    if(it != m.end()){
-        cout<<"Your recommended movie is "<<it->second[0]<<endl;
+    vector<string> bestMovieId = findBestMovieMap(m, genre1);
+    cout << "Your top five recommended movies:\n" << endl;
+    cout << "Name(Year)          Rating            Duration         Tagline" << endl;
+    for(int i = 0; i < bestMovieId.size(); i++)
+    {
+        auto it = m.find(bestMovieId[i]);
+        cout << it->second[0] << it->second[1];
     }
-    else{
-        cout<<"No movies match the search :("<<endl;
-    }
-
 
     return 0;
 }
