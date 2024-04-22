@@ -170,10 +170,20 @@ int main() {
 
     makeMap(m);
 
-
-    cout<<"Enter two desired genres: ";
-
-
+    cout << " _______________________________________" << endl;
+    cout << "|         Welcome to Show-Intel!        |" << endl;
+    cout << "|---------------------------------------|" << endl;
+    cout << "|      Action              Adventure    |" << endl;
+    cout << "|      Animation           Comedy       |" << endl;
+    cout << "|      Crime               Documentary  | " << endl;
+    cout << "|      Drama               Family       |" << endl;
+    cout << "|      Fantasy             History      |" << endl;
+    cout << "|      Horror              Music        |" << endl;
+    cout << "|      Mystery             Romance      |" << endl;
+    cout << "|      Science Fiction     Thriller     |" << endl;
+    cout << "|      TV Movie            War          |" << endl;
+    cout << "|      Western                          |" << endl;
+    cout << "-----------------------------------------" << endl;
     string genre1, genre2;
 
 
