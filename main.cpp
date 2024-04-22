@@ -225,15 +225,17 @@ int main() {
 
 
     cout<<genre1<<endl;
-    
+
 
     vector<string> bestMovieId = findBestMovieMap(m, genre1);
-    cout << "Your top five recommended movies:\n" << endl;
-    cout << "Name(Year)          Rating            Duration         Tagline" << endl;
+    cout << "        Your top five recommended movies:\n" << endl;
+    cout << "Name(Year)          Rating            Duration" << endl;
+    cout << "-----------------------------------------------" << endl;
     for(int i = 0; i < bestMovieId.size(); i++)
     {
         auto it = m.find(bestMovieId[i]);
-        cout << it->second[0] << it->second[1];
+        cout << i << ". " << it->second[0] << it->second[1] << endl;
+        cout << "Description: " << "\n"<< endl;
     }
 
     return 0;
