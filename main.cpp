@@ -4,9 +4,106 @@
 #include <sstream>
 #include <map>
 
-
 using namespace std;
 
+class unorderedMap{
+private:
+    vector<vector<string>> map;
+    vector<string> keys;
+public:
+    void insert(string key, vector<string> values){
+        bool unique = true;
+        for(int i=0; i<keys.size(); i++){
+            if(keys[i]==key){
+                unique = false;
+            }
+        }
+
+        if(unique){
+            values.insert(values.begin(), key);
+            map.push_back(values);
+        }
+        else{
+            cout<<"Key not unique"<<endl;
+        }
+    }
+
+    vector<vector<string>>::iterator begin(){
+        return map.begin();
+    }
+
+    vector<vector<string>>::iterator end(){
+        return map.end();
+    }
+
+    vector<vector<string>>::iterator find(string key){
+        vector<vector<string>>::iterator it;
+        for(it=map.begin(); it!=map.end(); it++){
+            if((*it)[0] == key){
+                return it;
+            }
+        }
+        return map.end();
+    }
+
+    int bucket(string key){
+        for(int i=0; i<map.size(); i++) {
+            if (map[i][0] == key) {
+                return i+1;
+            }
+        }
+        return -1;
+    }
+
+    int bucketCount(){
+        return map.size();
+    }
+
+    bool empty(){
+        if(map.size()==0){
+            return true;
+        }
+        return false;
+    }
+
+    void erase(string key){
+        for(int i=0; i<map.size(); i++){
+            if(map[i][0]==key){
+                map[i].clear();
+            }
+        }
+    }
+
+    vector<vector<string>> returnMap(){
+        return map;
+    }
+
+    void printMap(){
+        for(int i=0; i<map.size(); i++){
+            for(int j=0; j<map[i].size(); j++){
+                cout<<map[i][j]<<" ";
+            }
+            cout<<endl;
+        }
+    }
+};
+
+class Movies {
+private:
+    int id;
+    string name;
+    float rating;
+public:
+    Movies(int id, string name, float rating) {
+        this->id = id;
+        this->name = name;
+        this->rating = rating;
+    }
+
+    int getId() {
+        return id;
+    }
+};
 
 string findBestMovieMap(map<string,vector<string>> m, string genre1, string genre2){
     bool g1 = false , g2 = false;
@@ -184,22 +281,24 @@ int main() {
     cout << "|      TV Movie            War          |" << endl;
     cout << "|      Western                          |" << endl;
     cout << "-----------------------------------------" << endl;
-    string genre1, genre2;
+
+    cout<<endl;
+    cout<<"Enter desired genre: ";
+    string genre1;
 
 
     cin >> genre1;
-    cin >> genre2;
 
 
     cout<<endl;
 
 
-    cout<<genre1<<" "<<genre2<<endl;
+    cout<<genre1<<endl;
 
 
 
 
-    string bestMovieId = findBestMovieMap(m,genre1, genre2);
+    string bestMovieId = findBestMovieMap(m,genre1, genre1);
     auto it = m.find(bestMovieId);
     if(it != m.end()){
         cout<<"Your recommended movie is "<<it->second[0]<<endl;
@@ -211,6 +310,3 @@ int main() {
 
     return 0;
 }
-
-
-
