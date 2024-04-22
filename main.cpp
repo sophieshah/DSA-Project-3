@@ -94,11 +94,17 @@ private:
     int id;
     string name;
     float rating;
+    int date;
+    int duration;
+    string description;
 public:
-    Movies(int id, string name, float rating) {
+    Movies(int id, string name, float rating, int date, int duration, string description) {
         this->id = id;
         this->name = name;
         this->rating = rating;
+        this->date = date;
+        this->duration = duration;
+        this->description = description;
     }
 
     int getId() {
@@ -110,6 +116,15 @@ public:
     float getRating(){
         return rating;
     }
+    int getDate() {
+        return date;
+    }
+    int getDuration() {
+        return duration;
+    }
+    string getDescription(){
+        return description;
+    }
 };
 
 vector<string> findBestMovieUnordered(unorderedMap um, string genre){
@@ -119,7 +134,7 @@ vector<string> findBestMovieUnordered(unorderedMap um, string genre){
     //cout<<"about to start loop"<<endl;
     for(it = um.begin(); it != um.end(); it++){
         //cout<<(*it).size()<<endl;
-        for(int i=3; i<(*it).size(); it++){
+        for(int i=6; i<(*it).size(); it++){
             if((*it)[i] == genre){
                 //cout<<"found movie with genre "<<genre<<endl;
                 pair p1 = make_pair(stof((*it)[2]), (*it)[0]);
@@ -144,8 +159,11 @@ void makeUnorderedMap(unorderedMap &um, vector<Movies> movieVect){
         int id = movieVect[i].getId();
         string name = movieVect[i].getName();
         float rating = movieVect[i].getRating();
+        int date = movieVect[i].getDate();
+        int duration = movieVect[i].getDuration();
+        string description = movieVect[i].getDescription();
 
-        vector<string> values = {name, to_string(rating)};
+        vector<string> values = {name, to_string(rating), to_string(date), to_string(duration), description};
         um.insert(to_string(id), values);
     }
 
@@ -193,7 +211,7 @@ void readMovies(vector<Movies> &movieVect){
     if (!inFile.is_open()) {
         cout << "unopened" << endl;
     }
-    string line, movieId, name, rating;
+    string line, movieId, name, rating, date, minute, description;
     getline(inFile, line);
     istringstream s(line);
 
@@ -201,6 +219,9 @@ void readMovies(vector<Movies> &movieVect){
     getline(s, movieId, ',');
     getline(s, name, ',');
     getline(s, rating, ',');
+    getline(s, date, ',');
+    getline(s, minute, ',');
+    getline(s, description);
 
 
     for(int i=0; i<10000; i++){
@@ -210,9 +231,19 @@ void readMovies(vector<Movies> &movieVect){
         getline(s, movieId, ',');
         getline(s, name, ',');
         getline(s, rating, ',');
+        getline(s, date, ',');
+        getline(s, minute, ',');
+        getline(s, description);
 
-        Movies m1(stoi(movieId), name, stof(rating));
-        movieVect.push_back(m1);
+
+        try{
+            Movies m1(stoi(movieId), name, stof(rating), stoi(date), stoi(minute), description);
+            movieVect.push_back(m1);
+        }
+        catch(const std::invalid_argument &e){
+            cout<<"invalid stoi with "<<movieId<<endl;
+            continue;
+        }
     }
     inFile.close();
 }
@@ -226,7 +257,7 @@ vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1){
             // Saves rating
             float rating = stof(it->second[1]);
             // Iterates through genres of movie id
-            for(int i=2; i<it->second.size(); i++){
+            for(int i=5; i<it->second.size(); i++){
                 //cout<<rating<<endl;
                 if(it->second[i]== genre1){
                     ratingVector.emplace_back(rating, it->first);
@@ -261,7 +292,7 @@ void makeMap(map<string, vector<string>> &m){
 
     string movieId;
     vector<string> movieElements;
-    string line, name, rating;
+    string line, name, rating, date, minute, description;
 
 
     getline(inFile, line);
@@ -273,6 +304,9 @@ void makeMap(map<string, vector<string>> &m){
     getline(s, movieId, ',');
     getline(s, name, ',');
     getline(s, rating, ',');
+    getline(s, date, ',');
+    getline(s, minute, ',');
+    getline(s, description);
 
 
     for(int i=0; i<10000; i++){
@@ -288,12 +322,18 @@ void makeMap(map<string, vector<string>> &m){
         getline(s, movieId, ',');
         getline(s, name, ',');
         getline(s, rating, ',');
+        getline(s, date, ',');
+        getline(s, minute, ',');
+        getline(s, description);
 
 
         //cout<<movieId<<" "<<name<<" "<<rating<<endl;
         //movieElements.push_back(movieId);
         movieElements.push_back(name);
         movieElements.push_back(rating);
+        movieElements.push_back(date);
+        movieElements.push_back(minute);
+        movieElements.push_back(description);
 
 
         m.insert({movieId, movieElements});
@@ -409,11 +449,14 @@ int main() {
     cout << "        Your top five recommended movies:\n" << endl;
     cout << "Name(Year)          Rating            Duration" << endl;
     cout << "-----------------------------------------------" << endl;
+    cout<<endl;
+
     for(int i = 0; i < bestMovieId.size(); i++)
     {
         auto it = m.find(bestMovieId[i]);
-        cout << i << ". " << it->second[0] << it->second[1] << endl;
-        cout << "Description: " << "\n"<< endl;
+        cout << i+1 << ". " << it->second[0]<<"("<<it->second[2]<<")    Rating: " << it->second[1] <<"    Duration: "<<it->second[3]<< endl;
+        cout << "Description: " << it->second[4]<< "\n";
+        cout<< endl;
     }
 
 
