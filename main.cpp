@@ -127,19 +127,32 @@ public:
     }
 };
 
-vector<string> findBestMovieUnordered(unorderedMap um, string genre){
+vector<string> findBestMovieUnordered(unorderedMap um, string genre, string year, string duration){
     vector<string> topRanked;
     vector<pair<float, string>> topFive;
     vector<vector<string>>::iterator it;
     //cout<<"about to start loop"<<endl;
     for(it = um.begin(); it != um.end(); it++){
+        bool genre1 = false, date = false, length = false;
+
+            float rating = stof((*it)[2]);
+            // Iterates through genres of movie id
+            if(stoi((*it)[3]) == stoi(year)){
+                date = true;
+            }
+            if(stof((*it)[4]) <= stof(duration)*60.0){
+                length = true;
+            }
         //cout<<(*it).size()<<endl;
         for(int i=6; i<(*it).size(); it++){
             if((*it)[i] == genre){
                 //cout<<"found movie with genre "<<genre<<endl;
-                pair p1 = make_pair(stof((*it)[2]), (*it)[0]);
-                topFive.push_back(p1);
+                genre1 = true;
             }
+        }
+        if(genre1 && date && length){
+            pair p1 = make_pair(stof((*it)[2]), (*it)[0]);
+            topFive.push_back(p1);
         }
     }
     //cout<<"made it to end of top5"<<endl;
@@ -248,20 +261,30 @@ void readMovies(vector<Movies> &movieVect){
     inFile.close();
 }
 
-vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1){
+vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1, string year, string duration){
     vector<pair<float, string>> ratingVector;
     vector<string> topMovies;
     map<string, vector<string>>::iterator it;
     for(it=m.begin(); it != m.end(); it++){
+        bool genre = false, date = false, length = false;
         try{
             // Saves rating
             float rating = stof(it->second[1]);
             // Iterates through genres of movie id
+            if(stoi(it->second[2]) == stoi(year)){
+                date = true;
+            }
+            if(stof(it->second[3]) <= stof(duration)*60.0){
+                length = true;
+            }
             for(int i=5; i<it->second.size(); i++){
                 //cout<<rating<<endl;
                 if(it->second[i]== genre1){
-                    ratingVector.emplace_back(rating, it->first);
+                    genre = true;
                 }
+            }
+            if(date && length && genre){
+                ratingVector.emplace_back(rating, it->first);
             }
         }
         catch(const std::invalid_argument &e){
@@ -426,42 +449,55 @@ int main() {
     cout << "-----------------------------------------" << endl;
 
     cout<<endl;
+    string genre1, date, duration;
+
     cout<<"Enter desired genre: ";
-    string genre1;
-
-
     cin >> genre1;
+    cout<<endl;
+
+    cout<<"Enter desired year: ";
+    cin >> date;
+    cout<<endl;
+
+    cout<<"Enter maximum duration (in hours): ";
+    cin >> duration;
     cout<<endl<<endl<<endl;
-    //cout<<genre1<<endl;
 
 
-    findBestMovieUnordered(um, genre1);
-    vector<string> bestUmMovies = findBestMovieUnordered(um, genre1);
+    vector<string> bestUmMovies = findBestMovieUnordered(um, genre1, date, duration);
     cout << "        Your top five recommended movies:\n" << endl;
     cout << "Name(Year)          Rating            Duration" << endl;
     cout << "-----------------------------------------------" << endl;
     cout<<endl;
 
-    for(int i=0; i<5; i++){
+
+    if(bestUmMovies.size()<5){
+        cout<<"Sorry, there are only "<<bestUmMovies.size()<<" to match your search: "<<endl;
+    }
+    for(int i=0; i<bestUmMovies.size(); i++){
         auto it = um.find(bestUmMovies[i]);
         if(it != um.end()){
-            cout << i+1 << ". " << (*it)[1]<<"("<<(*it)[3]<<")    Rating: " << (*it)[2] <<"    Duration: "<<(*it)[4]<< endl;
+            cout << i+1 << ". " << (*it)[1]<<"("<<(*it)[3]<<")    Rating: " << (*it)[2] <<"    Duration: "<<(*it)[4]<<" minutes"<< endl;
             cout << "Description: " << (*it)[5]<< "\n";
             cout<<endl;
         }
     }
 
 
-   vector<string> bestMovieId = findBestMovieMap(m, genre1);
+
+   vector<string> bestMovieId = findBestMovieMap(m, genre1, date, duration);
     cout << "        Your top five recommended movies:\n" << endl;
     cout << "Name(Year)          Rating            Duration" << endl;
     cout << "-----------------------------------------------" << endl;
     cout<<endl;
 
+    if(bestUmMovies.size()<5){
+        cout<<"Sorry, there are only "<<bestUmMovies.size()<<" to match your search: "<<endl;
+    }
     for(int i = 0; i < bestMovieId.size(); i++)
     {
         auto it = m.find(bestMovieId[i]);
-        cout << i+1 << ". " << it->second[0]<<"("<<it->second[2]<<")    Rating: " << it->second[1] <<"    Duration: "<<it->second[3]<< endl;
+        cout << i+1 << ". " << it->second[0]<<"("<<it->second[2]<<")    Rating: " << it->second[1] <<"    Duration: "<<it->second[3]<<" minutes"<< endl;
         cout << "Description: " << it->second[4]<< "\n";
         cout<< endl;
     }
