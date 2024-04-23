@@ -4,14 +4,18 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
+using namespace chrono;
 
+//unordered map class made from scratch --> made as map<string, vector<string>>
 class unorderedMap{
 private:
     vector<vector<string>> map;
     vector<string> keys;
 public:
+    //inserts a key, value pair into map making sure the key is unique and then inserting the key as the 0th index and the values as the rest of the vector
     void insert(string key, vector<string> values){
         bool unique = true;
         for(int i=0; i<keys.size(); i++){
@@ -21,6 +25,7 @@ public:
         }
 
         if(unique){
+            keys.push_back(key);
             values.insert(values.begin(), key);
             map.push_back(values);
         }
@@ -29,14 +34,17 @@ public:
         }
     }
 
+    //returns iterator to the beginning of the map
     vector<vector<string>>::iterator begin(){
         return map.begin();
     }
 
+    //returns iterator to the end of the map
     vector<vector<string>>::iterator end(){
         return map.end();
     }
 
+    //returns iterator to the element in the map with the given key
     vector<vector<string>>::iterator find(string key){
         vector<vector<string>>::iterator it;
         for(it=map.begin(); it!=map.end(); it++){
@@ -47,6 +55,7 @@ public:
         return map.end();
     }
 
+    //erases the key, value pair in the map given a key to erase
     void erase(string key){
         for(int i=0; i<map.size(); i++){
             if(map[i][0]==key){
@@ -55,10 +64,12 @@ public:
         }
     }
 
+    //returns the map vector
     vector<vector<string>> returnMap(){
         return map;
     }
 
+    //prints every element held in the map
     void printMap(int num){
         for(int i=0; i<num; i++){
             for(int j=0; j<map[i].size(); j++){
@@ -69,6 +80,8 @@ public:
     }
 };
 
+//movie class that stores the movie id number, name, rating, duration, and description
+//only has constructor and return functions
 class Movies {
 private:
     int id;
@@ -107,6 +120,8 @@ public:
     }
 };
 
+//iterates through the unordered map to find the top five highest ranked movies with the given genre, year, and duration
+//returns a vector of keys to the movies
 vector<string> findBestMovieUnordered(unorderedMap um, string genre, string year, string duration){
     vector<string> topRanked;
     vector<pair<float, string>> topFive;
@@ -141,6 +156,7 @@ vector<string> findBestMovieUnordered(unorderedMap um, string genre, string year
     return topRanked;
 }
 
+//goes through the movies and genres in the csv data files and adds them to the unordered map
 void makeUnorderedMap(unorderedMap &um, vector<Movies> movieVect){
     for(int i=0; i<movieVect.size(); i++){
         int id = movieVect[i].getId();
@@ -169,7 +185,7 @@ void makeUnorderedMap(unorderedMap &um, vector<Movies> movieVect){
     getline(l, id, ',');
     getline(l, genre, ',');
 
-    for(int i=0; i<10000; i++){
+    for(int i=0; i<100000; i++){
         getline(inFile, line);
         istringstream l(line);
 
@@ -189,6 +205,7 @@ void makeUnorderedMap(unorderedMap &um, vector<Movies> movieVect){
 
 }
 
+//goes through the movies and genres in the csv data files, creates a movie object with the data, adds them to vector of movie objects
 void readMovies(vector<Movies> &movieVect){
     ifstream inFile;
 
@@ -209,7 +226,7 @@ void readMovies(vector<Movies> &movieVect){
     getline(s, description);
 
 
-    for(int i=0; i<10000; i++){
+    for(int i=0; i<100000; i++){
         getline(inFile, line);
         istringstream s(line);
 
@@ -233,6 +250,8 @@ void readMovies(vector<Movies> &movieVect){
     inFile.close();
 }
 
+//iterates through the map to find the top five highest ranked movies with the given genre, year, and duration
+//returns a vector of keys to the movies
 vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1, string year, string duration){
     vector<pair<float, string>> ratingVector;
     vector<string> topMovies;
@@ -271,6 +290,7 @@ vector<string> findBestMovieMap(map<string,vector<string>> m, string genre1, str
     return topMovies;
 }
 
+//goes through the movies and genres in the csv data files and adds them to the unordered map
 void makeMap(map<string, vector<string>> &m){
 
 
@@ -302,7 +322,7 @@ void makeMap(map<string, vector<string>> &m){
     getline(s, description);
 
 
-    for(int i=0; i<10000; i++){
+    for(int i=0; i<100000; i++){
         movieElements.clear();
 
 
@@ -352,7 +372,7 @@ void makeMap(map<string, vector<string>> &m){
     getline(b, genre, ',');
 
 
-    for(int i=0; i<10000; i++){
+    for(int i=0; i<100000; i++){
         getline(inFile, line);
         istringstream b(line);
 
@@ -381,11 +401,6 @@ int main() {
     map<string, vector<string>> m;
     unorderedMap um;
     vector<Movies> movieVect;
-
-
-    makeMap(m);
-    readMovies(movieVect);
-    makeUnorderedMap(um, movieVect);
 
     cout << " _______________________________________" << endl;
     cout << "|         Welcome to Show-Intel!        |" << endl;
@@ -417,13 +432,20 @@ int main() {
     cin >> duration;
     cout<<endl<<endl<<endl;
 
+
+    //auto start = high_resolution_clock ::now();
+    readMovies(movieVect);
+    makeUnorderedMap(um, movieVect);
+//    auto stop = high_resolution_clock ::now();
+//    auto difference = duration_cast<microseconds>(stop - start);
+//    cout << difference.count() << endl;
+//
     vector<string> bestUmMovies = findBestMovieUnordered(um, genre1, date, duration);
     if(bestUmMovies.size()<5){
         cout<<"Sorry, there are only "<<bestUmMovies.size()<<" to match your search: "<<endl;
     }
     cout << "Your top five recommended movies with unordered map:\n" << endl;
     cout << "Name(Year)          Rating            Duration" << endl;
-    cout << "-----------------------------------------------" << endl;
     cout<<endl;
 
     for(int i=0; i<bestUmMovies.size(); i++){
@@ -437,14 +459,19 @@ int main() {
 
     cout<<endl<<endl<<endl;
 
-   vector<string> bestMovieId = findBestMovieMap(m, genre1, date, duration);
+//    auto start = high_resolution_clock ::now();
+    makeMap(m);
+    vector<string> bestMovieId = findBestMovieMap(m, genre1, date, duration);
+//    auto stop = high_resolution_clock ::now();
+//    auto difference = duration_cast<microseconds>(stop - start);
+//    cout << difference.count() << endl;
+
     cout << " Your top five recommended movies with map:\n" << endl;
     cout << "Name(Year)          Rating            Duration" << endl;
-    cout << "-----------------------------------------------" << endl;
     cout<<endl;
 
-    if(bestUmMovies.size()<5){
-        cout<<"Sorry, there are only "<<bestUmMovies.size()<<" to match your search: "<<endl;
+    if(bestMovieId.size()<5){
+        cout<<"Sorry, there are only "<<bestMovieId.size()<<" to match your search: "<<endl;
     }
     for(int i = 0; i < bestMovieId.size(); i++)
     {
